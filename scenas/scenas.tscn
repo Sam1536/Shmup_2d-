@@ -1,0 +1,200 @@
+[gd_scene load_steps=22 format=2]
+
+[ext_resource path="res://scripts/Background.gd" type="Script" id=1]
+[ext_resource path="res://scripts/scenas.gd" type="Script" id=2]
+[ext_resource path="res://scripts/camera.gd" type="Script" id=3]
+[ext_resource path="res://shmup2D/sprites/background.png" type="Texture" id=4]
+[ext_resource path="res://shmup2D/sprites/ship.png" type="Texture" id=5]
+[ext_resource path="res://scripts/inimigo.gd" type="Script" id=6]
+[ext_resource path="res://scripts/lezeres.gd" type="Script" id=7]
+[ext_resource path="res://scripts/HUD.gd" type="Script" id=8]
+[ext_resource path="res://scenas/escudo.tscn" type="PackedScene" id=9]
+[ext_resource path="res://scripts/gamer.gd" type="Script" id=10]
+[ext_resource path="res://scenas/new_gdscript.gd" type="Script" id=11]
+
+[sub_resource type="Shader" id=3]
+code = "// NOTE: Shader automatically converted from Godot Engine 3.4.4.stable.mono's CanvasItemMaterial.
+
+shader_type canvas_item;
+
+
+uniform float vel = -.5f;
+uniform float des = 0f;
+uniform float time = 0f;
+
+void fragment(){
+	COLOR = texture(TEXTURE ,UV + (vec2(0,1f) * time * vel) + vec2(des, 0) );
+	
+}"
+
+[sub_resource type="ShaderMaterial" id=4]
+resource_local_to_scene = true
+shader = SubResource( 3 )
+shader_param/vel = -0.5
+shader_param/des = 0.0
+shader_param/time = 0.0
+
+[sub_resource type="CircleShape2D" id=8]
+radius = 21.0238
+
+[sub_resource type="CircleShape2D" id=7]
+radius = 33.0
+
+[sub_resource type="Animation" id=1]
+length = 2.0
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Ship:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0 ]
+}
+
+[sub_resource type="Animation" id=2]
+resource_name = "fogo"
+length = 0.2
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Ship:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0.000820696, 0.0481594 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ 0, 1 ]
+}
+
+[sub_resource type="DynamicFontData" id=5]
+antialiased = false
+font_path = "res://fontes/PressStart2P.ttf"
+
+[sub_resource type="DynamicFont" id=6]
+font_data = SubResource( 5 )
+
+[sub_resource type="DynamicFontData" id=9]
+font_path = "res://fontes/PressStart2P.ttf"
+
+[sub_resource type="DynamicFont" id=10]
+size = 32
+font_data = SubResource( 9 )
+
+[node name="game" type="Node2D"]
+position = Vector2( 0, -2 )
+script = ExtResource( 10 )
+
+[node name="Background" type="Sprite" parent="."]
+material = SubResource( 4 )
+position = Vector2( 79.5, 144 )
+scale = Vector2( 1.06875, 1.03472 )
+texture = ExtResource( 4 )
+script = ExtResource( 1 )
+nave = NodePath("../shmup2D/Ship")
+
+[node name="shmup2D" type="Node2D" parent="." groups=["player"]]
+position = Vector2( 85, 244 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_group_": true
+}
+lezeres = NodePath("../cenario")
+
+[node name="dead_area" type="Area2D" parent="shmup2D"]
+position = Vector2( 1, -1 )
+collision_mask = 4
+
+[node name="shape" type="CollisionShape2D" parent="shmup2D/dead_area"]
+position = Vector2( 1, 2 )
+shape = SubResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="area" type="Area2D" parent="shmup2D"]
+position = Vector2( 3, 1 )
+collision_mask = 4
+
+[node name="shape" type="CollisionShape2D" parent="shmup2D/area"]
+position = Vector2( -2, -1 )
+shape = SubResource( 7 )
+
+[node name="escudo" parent="shmup2D" instance=ExtResource( 9 )]
+position = Vector2( -2, -2 )
+
+[node name="Sprite" parent="shmup2D/escudo" index="0"]
+position = Vector2( 3, 2.25 )
+scale = Vector2( 0.825, 0.83125 )
+
+[node name="Ship" type="Sprite" parent="shmup2D"]
+position = Vector2( 2, 3 )
+texture = ExtResource( 5 )
+hframes = 2
+
+[node name="animaçao" type="AnimationPlayer" parent="shmup2D"]
+autoplay = "RESET"
+anims/RESET = SubResource( 1 )
+anims/fogo = SubResource( 2 )
+
+[node name="blaster" type="Position2D" parent="shmup2D"]
+position = Vector2( 2, -26 )
+
+[node name="cenario" type="Node2D" parent="."]
+position = Vector2( -6.16717e-05, -7.58767e-05 )
+script = ExtResource( 7 )
+nave = NodePath("../shmup2D/Ship")
+
+[node name="inimigo" type="Node2D" parent="cenario"]
+script = ExtResource( 6 )
+
+[node name="spawn_timer" type="Timer" parent="cenario/inimigo"]
+
+[node name="camera" type="Camera2D" parent="." groups=["camera"]]
+anchor_mode = 0
+current = true
+script = ExtResource( 3 )
+
+[node name="HUD" type="CanvasLayer" parent="." groups=["hud"]]
+script = ExtResource( 8 )
+
+[node name="score" type="Label" parent="HUD"]
+margin_left = 1.0
+margin_top = 2.0
+margin_right = 177.0
+margin_bottom = 37.0
+custom_fonts/font = SubResource( 6 )
+text = "0
+"
+
+[node name="contagem" type="Node2D" parent="HUD"]
+pause_mode = 2
+position = Vector2( 1, -3 )
+script = ExtResource( 11 )
+
+[node name="label" type="Label" parent="HUD/contagem"]
+pause_mode = 1
+margin_left = -4.0
+margin_top = -1.0
+margin_right = 163.0
+margin_bottom = 287.0
+custom_fonts/font = SubResource( 10 )
+text = "3"
+align = 1
+valign = 1
+
+[node name="timer" type="Timer" parent="HUD/contagem"]
+autostart = true
+
+[connection signal="area_exited" from="shmup2D/dead_area" to="shmup2D" method="_on_dead_area_area_exited"]
+[connection signal="area_entered" from="shmup2D/area" to="shmup2D" method="_on_area_area_entered"]
+[connection signal="timeout" from="cenario/inimigo/spawn_timer" to="cenario/inimigo" method="_on_Timer_timeout"]
+[connection signal="timeout" from="HUD/contagem/timer" to="HUD/contagem" method="_on_timer_timeout"]
+
+[editable path="shmup2D/escudo"]

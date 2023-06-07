@@ -1,0 +1,73 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://audio/miniexplosao.wav" type="AudioStream" id=1]
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Node2D
+
+
+func _ready():
+	$particulas.emitting = true
+	$sparks.emitting = true
+
+func _process(delta):
+	if not $particulas.emitting and not $sparks.emitting:
+		queue_free()
+
+"
+
+[sub_resource type="CanvasItemMaterial" id=5]
+blend_mode = 1
+
+[sub_resource type="Gradient" id=1]
+offsets = PoolRealArray( 0.268817, 0.274194, 0.376344, 0.596774, 0.88172, 0.903226 )
+colors = PoolColorArray( 0.588236, 0, 0, 0.411764, 0.301075, 0.301075, 0.301075, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0 )
+
+[sub_resource type="GradientTexture" id=2]
+gradient = SubResource( 1 )
+
+[sub_resource type="ParticlesMaterial" id=3]
+flag_disable_z = true
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 50.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+damping = 34.86
+scale = 15.0
+scale_random = 0.82
+color = Color( 1, 1, 0.054902, 1 )
+color_ramp = SubResource( 2 )
+
+[sub_resource type="ParticlesMaterial" id=6]
+flag_disable_z = true
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 140.35
+initial_velocity_random = 0.47
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+color = Color( 1, 0.972549, 0, 1 )
+
+[node name="explosao" type="Node2D"]
+script = SubResource( 4 )
+
+[node name="particulas" type="Particles2D" parent="."]
+material = SubResource( 5 )
+emitting = false
+amount = 50
+one_shot = true
+explosiveness = 0.83
+process_material = SubResource( 3 )
+
+[node name="sparks" type="Particles2D" parent="."]
+emitting = false
+amount = 50
+one_shot = true
+explosiveness = 0.89
+process_material = SubResource( 6 )
+
+[node name="impacto" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 1 )
+autoplay = true
+bus = "audio"
